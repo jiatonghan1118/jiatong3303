@@ -29,6 +29,8 @@ public class Scheduler {
     DatagramSocket sendReceiveSocket, floorReceiveSocket, sendSocket;
     DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
+    private RequestConsumer requestConsumer;
+
 
     String ELEVATOR_IP_ADDRESS = "";
 
@@ -36,11 +38,17 @@ public class Scheduler {
      * Constructor for class Scheduler
      */
     public Scheduler() {
-        RequestConsumer requestConsumer = new RequestConsumer(requestQueue,elevatorStatus,elevatorSendSocket);
+        //initial elevator status hard code need to change
+        for (int i = 0; i < 4; i++) {
+            elevatorStatus.add(new ElevatorInfo(0,1,"STAY"));
+        }
+
 
         try {
             //sendReceiveSocket = new DatagramSocket();
             elevatorSendSocket = new DatagramSocket();
+            requestConsumer = new RequestConsumer(requestQueue,elevatorStatus,elevatorSendSocket,this);
+            requestConsumer.start();
             elevatorReceiveSocket = new DatagramSocket(RECEIVEELEVATORPORT);
             floorReceiveSocket = new DatagramSocket(RECEIVEFLOORPORT);
 
@@ -114,88 +122,19 @@ public class Scheduler {
         return false;
     }
 
-    /**
-     *MachineState handles the states of the scheduler
-     */
-    public enum MachineState {
-        Waiting {
-            @Override
-            public MachineState nextState() {
-                return Instructing;
-            }
-
-            @Override
-            public String currentState() {
-                return "Waiting";
-            }
-        },
-        Instructing {
-            @Override
-            public MachineState nextState() {
-                return Waiting;
-            }
-
-            @Override
-            public String currentState() {
-                return "Instructing";
-            }
-        };
-        public abstract MachineState nextState();
-        public abstract String currentState();
-    }
-
-//    /**
-//     * receiveFromFloor receives request from floor
-//     */
-//    public void receiveFromFloor() {
-//
-//        if(destiUp.isEmpty()&&destiDown.isEmpty()) {
-//            byte msg[] = new byte[40];
+//    public RequestMsg getFirstRequest() {
+//        RequestMsg firstQuest;
+//        synchronized (requestQueue){
+//            while((firstQuest = requestQueue.peek())==null){
+//                try {
+//                    wait();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            return firstQuest;
 //        }
-//
-//        receivePacket = waitPacket(receiveSocket, "Scheduler");
-//        byte[] msg = receivePacket.getData();
-//        req = msg;
-//        System.out.println("Scheduler receved floor request");
-//        if (msg[0] > msg[3]) {
-//            destiDown.add((int) msg[3]);
-//        }
-//
-//        if(msg[0] < msg[3]) {
-//            destiUp.add((int) msg[3]);
-//        }
-//
-//        //DatagramPacket reply = waitPacket(receiveSocket, "Scheduler");
-//        Floor.sendPacket(receivePacket.getData(), receivePacket.getLength(), receivePacket.getAddress(),
-//                receivePacket.getPort(), sendSocket);
-//
 //    }
-    /**
-     * Wait the packet from floor
-     * @param s
-     * @param source
-     * @return
-     */
-    public DatagramPacket waitPacket(DatagramSocket s, String source){
-
-        byte data[] = new byte[RequestMsg.MSGSIZE];
-
-        DatagramPacket receivedPacket = new DatagramPacket(data, data.length);
-        System.out.println(source + " is waiting");
-
-        try{
-            System.out.println("waiting...");
-            s.receive(receivedPacket);
-        }catch (IOException e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        System.out.println("From host: " + receivedPacket.getAddress());
-        System.out.println("Destination host port: " + receivedPacket.getPort());
-        return receivedPacket;
-    }
 
 
     public void receiveFromFloor(){
@@ -204,11 +143,8 @@ public class Scheduler {
             System.out.println("Received from floor");
             System.out.println(Arrays.toString(floorReceivedPacket.getData()));
             RequestMsg floorMsg = RequestMsg.decode(floorReceivedPacket.getData());
-
-            synchronized (requestQueue){
-                requestQueue.offer(floorMsg);
-            }
-
+//            requestQueue.offer(floorMsg);
+            requestConsumer.schedule(floorMsg);
         } catch (IOException e) {
             e.printStackTrace();
         }
