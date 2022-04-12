@@ -36,7 +36,8 @@ public class Scheduler {
      * Constructor for class Scheduler
      */
     public Scheduler() {
-        RequestConsumer requestConsumer = new RequestConsumer(requestQueue,elevatorStatus,elevatorSendSocket);
+        RequestConsumer requestConsumer = new RequestConsumer(requestQueue,elevatorStatus,elevatorSendSocket,this);
+        requestConsumer.start();
 
         try {
             //sendReceiveSocket = new DatagramSocket();
@@ -112,6 +113,20 @@ public class Scheduler {
             return true;
         }
         return false;
+    }
+
+    public RequestMsg getFirstRequest() {
+        RequestMsg firstQuest;
+        synchronized (requestQueue){
+            while((firstQuest = requestQueue.peek())==null){
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return firstQuest;
+        }
     }
 
     /**
@@ -204,11 +219,7 @@ public class Scheduler {
             System.out.println("Received from floor");
             System.out.println(Arrays.toString(floorReceivedPacket.getData()));
             RequestMsg floorMsg = RequestMsg.decode(floorReceivedPacket.getData());
-
-            synchronized (requestQueue){
-                requestQueue.offer(floorMsg);
-            }
-
+            requestQueue.offer(floorMsg);
         } catch (IOException e) {
             e.printStackTrace();
         }
