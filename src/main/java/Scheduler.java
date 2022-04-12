@@ -25,7 +25,7 @@ public class Scheduler {
     private ArrayList<ElevatorInfo> elevatorStatus=new ArrayList<>();
 
 
-    DatagramPacket floorReceivedPacket, elevatorReceivedPacket;
+    DatagramPacket floorReceivedPacket;
     DatagramSocket sendReceiveSocket, floorReceiveSocket, sendSocket;
     DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
@@ -48,8 +48,9 @@ public class Scheduler {
             //sendReceiveSocket = new DatagramSocket();
             elevatorSendSocket = new DatagramSocket();
             requestConsumer = new RequestConsumer(requestQueue,elevatorStatus,elevatorSendSocket,this);
-            requestConsumer.start();
             elevatorReceiveSocket = new DatagramSocket(RECEIVEELEVATORPORT);
+            StatusUpdater updater = new StatusUpdater(elevatorStatus,elevatorReceiveSocket);
+            updater.start();
             floorReceiveSocket = new DatagramSocket(RECEIVEFLOORPORT);
 
             floorReceivedPacket=new DatagramPacket(receiveFloorBuffer,receiveFloorBuffer.length);

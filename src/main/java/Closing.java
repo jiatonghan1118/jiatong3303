@@ -31,10 +31,13 @@ public class Closing implements ElevatorState {
  */
     @Override
     public void timeIsUp() {
+        System.out.println("door closed");
         elevator.setCurrentState(elevator.getEleMove());
         System.out.println("Elevator begin to move to destination");
+        int arrivalTime = Math.abs(elevator.getQueue().first()-elevator.getCurrentFloor());
+        System.out.println("will arrive after: "+ arrivalTime + "s");
 
-        elevator.timerStart((Math.abs(elevator.getQueue().peek()-elevator.getCurrentFloor()))*100);
+        elevator.timerStart((arrivalTime*100));
     }
 
     @Override

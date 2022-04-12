@@ -20,8 +20,8 @@ public class Elevator {
     private Timer timer;
     private TimerTask ring;
 
-    private PriorityQueue<Integer> upQueue=new PriorityQueue();
-    private PriorityQueue<Integer> downQueue=new PriorityQueue<>(Comparator.reverseOrder());
+    private TreeSet<Integer> upQueue=new TreeSet<>(Comparator.naturalOrder());
+    private TreeSet<Integer> downQueue=new TreeSet<>(Comparator.reverseOrder());
 
     ElevatorState idle;
     ElevatorState opening;
@@ -41,7 +41,6 @@ public class Elevator {
         closing=new Closing(this);
         opening =new Opening(this);
         moveEle=new MoveEle(this);
-        reachFloor=new ReachFloor(this);
 
         currentState =idle;
         this.id=id;
@@ -52,7 +51,6 @@ public class Elevator {
         closing=new Closing(this);
         opening =new Opening(this);
         moveEle=new MoveEle(this);
-        reachFloor=new ReachFloor(this);
 
         currentState =idle;
 
@@ -67,7 +65,6 @@ public class Elevator {
         closing=new Closing(this);
         opening =new Opening(this);
         moveEle=new MoveEle(this);
-        reachFloor=new ReachFloor(this);
 
         currentState =idle;
 
@@ -86,7 +83,7 @@ public class Elevator {
      * return task list based on direction
      * @return queue
      */
-    public PriorityQueue<Integer> getQueue(){
+    public TreeSet<Integer> getQueue(){
         if(currentDirection==UP){
             return upQueue;
         }else if(currentDirection==DOWN){
@@ -165,10 +162,6 @@ public class Elevator {
                 }
             }
         }
-        System.out.println("Element in upQueue");
-        System.out.println(Arrays.toString(upQueue.toArray()));
-        System.out.println("Element in downQueue");
-        System.out.println(Arrays.toString(downQueue.toArray()));
 
         currentState.receiveRequest();
     }
@@ -196,6 +189,14 @@ public class Elevator {
      */
     public ElevatorState getEleMove(){
         return moveEle;
+    }
+
+    public void setCurrentFloor(int currentFloor) {
+        this.currentFloor = currentFloor;
+    }
+
+    public int getId() {
+        return id;
     }
 
     /**

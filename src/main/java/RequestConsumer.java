@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-public class RequestConsumer extends Thread{
+public class RequestConsumer{
     private Queue<RequestMsg> requestQueue;
     private ArrayList<ElevatorInfo> elevatorStatus;
     private DatagramSocket elevatorSendSocket;
@@ -79,43 +79,8 @@ public class RequestConsumer extends Thread{
 
     }
 
-
-
-
     private boolean sameDirection(ElevatorInfo info, RequestMsg firstQuest) {
         if(info.getCurrentDirection()== firstQuest.getDirection()){return  true;}
         return false;
-    }
-
-    @Override
-    public void run() {
-        int bestId;
-        while(true){
-            RequestMsg firstQuest;
-            synchronized (this) {
-                while ((firstQuest = requestQueue.peek()) == null) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                bestId = findBestElevatorID(elevatorStatus,firstQuest);
-                requestQueue.poll();
-            }
-
-            RequestMsg elevatorMsg = new RequestMsg(firstQuest,bestId);
-            byte[] buffer= elevatorMsg.encode();
-
-            try {
-                DatagramPacket elevatorInstruction = new DatagramPacket(
-                        buffer,buffer.length, InetAddress.getLocalHost(),
-                        ElevatorSubSystem.RECEIVESCHEDULER);
-                elevatorSendSocket.send(elevatorInstruction);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
