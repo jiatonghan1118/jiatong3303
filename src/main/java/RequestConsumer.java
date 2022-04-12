@@ -24,8 +24,23 @@ public class RequestConsumer extends Thread{
         this.scheduler = scheduler;
     }
 
+    public void schedule(RequestMsg floorMsg) {
+        int bestId = findBestElevatorID(elevatorStatus,floorMsg);
+        requestQueue.poll();
+        RequestMsg elevatorMsg = new RequestMsg(floorMsg,bestId);
+        byte[] buffer= elevatorMsg.encode();
+        try {
+            DatagramPacket elevatorInstruction = new DatagramPacket(
+                    buffer,buffer.length, InetAddress.getLocalHost(),
+                    ElevatorSubSystem.RECEIVESCHEDULER);
+            elevatorSendSocket.send(elevatorInstruction);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
+
     private int findBestElevatorID(ArrayList<ElevatorInfo> elevatorStatus, RequestMsg firstQuest) {
-        ElevatorInfo best;
         PriorityQueue<ElevatorInfo> candidate = new PriorityQueue<>(
                 (info1,info2) -> {
 
