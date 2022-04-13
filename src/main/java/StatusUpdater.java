@@ -28,8 +28,7 @@ public class StatusUpdater extends Thread{
                 ElevatorInfo info = ElevatorInfo.decode(elevatorReceivedPacket.getData());
                 int id = info.getId();
                 synchronized (elevatorStatus) {
-                    ElevatorInfo old = elevatorStatus.get(id);
-                    old = info;
+                    elevatorStatus.set(id,info);
                 }
                 System.out.println("elevatorInfo updated");
             } catch (IOException e) {

@@ -41,6 +41,12 @@ public class RequestConsumer{
 
 
     private int findBestElevatorID(ArrayList<ElevatorInfo> elevatorStatus, RequestMsg firstQuest) {
+        System.out.println("elevator status");
+        for (ElevatorInfo info : elevatorStatus){
+            System.out.println(info.toString());
+        }
+        System.out.println("firstQuest");
+        System.out.println(firstQuest.toString());
         PriorityQueue<ElevatorInfo> candidate = new PriorityQueue<>(
                 (info1,info2) -> {
 
@@ -61,6 +67,7 @@ public class RequestConsumer{
         }
         //rule 2: if no elevator in the same direction, find idle one
         if(candidate.isEmpty()){
+            System.out.println("apply  rule 2");
             for (ElevatorInfo info: elevatorStatus) {
                 if(info.getCurrentDirection().equals("STAY")){
                     candidate.add(info);
@@ -69,11 +76,15 @@ public class RequestConsumer{
         }
         //rule 3: if no idle either, give it to first elevator
         if(candidate.isEmpty()){
+            System.out.println("apply  rule 3");
             candidate.add(elevatorStatus.get(0));
         }
 
 
         int id = candidate.peek().getId();
+        System.out.println("cadidates");
+        System.out.println(candidate);
+        System.out.println("best elevator is #" + id);
 
         return id;
 

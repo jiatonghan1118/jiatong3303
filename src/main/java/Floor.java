@@ -103,6 +103,7 @@ public class Floor{
                     }
                 }
             };
+            System.out.println("request delay " + delay);
 
             t.schedule(req,delay*1000);
         }
