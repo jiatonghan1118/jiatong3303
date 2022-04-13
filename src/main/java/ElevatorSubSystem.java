@@ -20,7 +20,7 @@ public class ElevatorSubSystem{
     private int elevatorNum;
 
     /**
-     * read from config file and initial system and GUI
+     * Read from config file and initial system and GUI
      */
     public ElevatorSubSystem(int elevatorNum,int floorNum) {
         //According to provide elevator number, add the elevators into this system
@@ -40,7 +40,7 @@ public class ElevatorSubSystem{
     }
 
     /**
-     * get Elevator by ID
+     * Get Elevator by ID
      * @param id Elevator ID
      * @return the Elevator reference
      */
@@ -49,7 +49,7 @@ public class ElevatorSubSystem{
     }
 
     /**
-     * receive message from scheduler on port 80 using UDP
+     * Receive message from scheduler on port 80 using UDP
      */
     private void receive() {
         //Through message id, to find the responding elevator to receive request.
