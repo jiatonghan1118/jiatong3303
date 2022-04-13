@@ -46,6 +46,10 @@ public class Elevator {
         this.id=id;
     }
 
+    /**
+     * Constructor for elevator
+     * @param scheduler
+     */
     public Elevator(Scheduler scheduler) {
         idle=new Idle(this);
         closing=new Closing(this);
@@ -57,6 +61,7 @@ public class Elevator {
         this.scheduler = scheduler;
         scheduler.addElevator(this);
     }
+    
     /**
      * Default constructor for Elevator class
      */
@@ -80,7 +85,7 @@ public class Elevator {
     }
 
     /**
-     * return task list based on direction
+     * Return task list based on direction
      * @return queue
      */
     public TreeSet<Integer> getQueue(){
@@ -97,7 +102,7 @@ public class Elevator {
 
 
     /**
-     * setCurrentState
+     * Set current state
      * @param newElevatorState
      */
     public void setCurrentState(ElevatorState newElevatorState){
@@ -105,7 +110,8 @@ public class Elevator {
     }
 
     /**
-     * timerStart
+     * Timer start
+     * @param delay
      */
     public void timerStart(int delay) {
         timer=new Timer();
@@ -118,13 +124,16 @@ public class Elevator {
         timer.schedule(ring,delay);
     }
 
-    /**
-     * receiveRequest
+   /**
+     * Receive request from RequestMsg
+     * @param requestMsg
      */
     public void receiveRequest(RequestMsg requestMsg){
         int direction=RequestMsg.directionToInt(requestMsg.getDirection());
         int from=requestMsg.getStartFloor();
         int destination=requestMsg.getDestination();
+        
+         //current direction is up
         if(currentDirection==UP){
             if(direction==UP){
                 upQueue.add(from);
@@ -135,6 +144,8 @@ public class Elevator {
             }else{
                 System.out.println("ERROR");
             }
+            
+            //current direction is down
         }else if(currentDirection==DOWN){
             if(direction==DOWN){
                 downQueue.add(from);
@@ -145,7 +156,9 @@ public class Elevator {
             }else{
                 System.out.println("ERROR");
             }
-        }else{//elevator idle
+        }else{
+            
+            //elevator idle
             if(from>(getCurrentFloor())){
                 currentDirection=UP;
                 receiveRequest(requestMsg);
@@ -169,38 +182,47 @@ public class Elevator {
 
 
     /**
-     * getClosing returns closing state
+     * Returns closing state
      * @return closing
      */
     public ElevatorState getClosing() {
         return closing;
     }
+    
     /**
-     * getOpenig returns opening state
+     * Returns opening state
      * @return opening
      */
     public ElevatorState getOpening() {
         return opening;
     }
 
-    /**
-     * getEleMove returns moveEle state
+   /**
+     * Returns moveEle state
      * @return moveEle
      */
     public ElevatorState getEleMove(){
         return moveEle;
     }
-
+    
+    /**
+     * Set current floor
+     * @param currentFloor
+     */
     public void setCurrentFloor(int currentFloor) {
         this.currentFloor = currentFloor;
     }
-
+    
+    /**
+     * Get elevator ID
+     * @return
+     */
     public int getId() {
         return id;
     }
 
     /**
-     * GetIdle returns idle state
+     * Returns idle state
      * @return idle
      */
     public ElevatorState getIdle() {
@@ -216,9 +238,9 @@ public class Elevator {
     }
 
 
-
-    /**
-     *convert height to floor
+     /**
+     * Get Current Floor
+     * @return
      */
     public int getCurrentFloor(){
         return currentFloor;
